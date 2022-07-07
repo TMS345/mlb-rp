@@ -1,23 +1,61 @@
-import http.client
+import requests
 
-conn = http.client.HTTPSConnection("mlb-data.p.rapidapi.com")
+url = "https://mlb-data.p.rapidapi.com/json/named.player_info.bam"
 
-<<<<<<< HEAD
-headers = 
-{
-    'X-RapidAPI-Key': "SIGN-UP-FOR-KEY",
-=======
-headers = {
-    'X-RapidAPI-Key': "d2e36dc2aemsh56d545e7ce2aba1p144f27jsn7ac9a581efba",
->>>>>>> abd3ef4bfabaf2708e62d8d6549878ae0e4eebad
-    'X-RapidAPI-Host': "mlb-data.p.rapidapi.com"
-}
+def __get_input ():
+    exit = False
 
-conn.request("GET", "/json/named.roster_40.bam?team_id='121'", headers=headers)
+    while (not exit):
+        i = str (input ("1 - Search for a player\n2 - Search for a team\n3 - Exit the program" 
+               + "\n\nEnter your selection: "))
 
-res = conn.getresponse()
-data = res.read()
+        print_format ()
+    
+        if (i == "1"): 
+            __get_player ()
+        elif (i == "2"):
+            __get_roster ()
+        elif (i == "3"):
+            exit = True
+        else:    
+            print ("Ensure that your input is correct")
 
-print(data.decode("utf-8"))
+        print_format ()
 
-print("API KEY AND HOST HAS BEEN UPDATED")
+
+def __get_player ():
+
+    querystring = {"sport_code":"'mlb'","player_id":"'493316'"}
+
+    headers = {
+        "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
+        "X-RapidAPI-Host": "mlb-data.p.rapidapi.com"
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+
+    print(response.text)
+
+
+def __get_roster ():
+
+    querystring = {"team_id":"'121'"}
+
+    headers = {
+        "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
+        "X-RapidAPI-Host": "mlb-data.p.rapidapi.com"
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+
+    return (response.text)
+
+
+def print_format ():
+    print ("")
+    print ('*' * 164)
+    print ("")
+
+
+if __name__ == '__main__':
+    __get_input ()
