@@ -1,1 +1,1 @@
-URL = ""
+URL = "https://httpbin.org/cookies"
