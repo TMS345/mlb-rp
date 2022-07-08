@@ -29,14 +29,14 @@ def __menu (connection):
         print_format_one ()
 
 
-def __print_proj (exit = False):
+def __print_proj (name, exit = False):
     while (not exit):
         i = str (input ("1 - Projected Hitting Stats\n2 - Projected Pitching Stats\n3 - Return" +
             "\n\nEnter your selection: ")) 
                     
         if (i == "1"):
             print_format_three ()
-            __get_proj_hit ()
+            __get_proj_hit (name)
             print_format_three ()
         elif (i == "2"):
             print_format_three ()
@@ -105,7 +105,7 @@ def __get_player_info(name, connection):
     exit = False
 
     while (not exit):
-        i = str (input ("1 - General player info\n2 - Projected Stats\n3 - Season Stats" + 
+        i = str (input("1 - General player info\n2 - Projected Stats\n3 - Season Stats" + 
             "\n4 - Career Stats\n5 - League Stats\n6 - Return\n\nEnter your selection: "))
         
         if (i == "1"): 
@@ -114,7 +114,7 @@ def __get_player_info(name, connection):
             print_format_three ()
         elif (i == "2"):
             print_format_two ()
-            __print_proj ()
+            __print_proj(name)
         elif (i == "3"):
             print_format_two ()
             __print_sn ()
@@ -226,10 +226,10 @@ def __get_league_pitch ():
     print(response.text)
 
 
-def __get_proj_pitch ():
-
+def __get_proj_pitch (name):
+    
     url = "https://mlb-data.p.rapidapi.com/json/named.proj_pecota_pitching.bam"
-
+    
     querystring = {"player_id":"'592789'","league_list_id":"'mlb'","season":"'2017'"}
 
     headers = {
@@ -252,11 +252,12 @@ def __get_proj_pitch ():
     #print(response.text)
 
 
-def __get_proj_hit ():
+def __get_proj_hit (name):
 
     url = "https://mlb-data.p.rapidapi.com/json/named.proj_pecota_batting.bam"
-
-    querystring = {"player_id":"'592789'","league_list_id":"'mlb'","season":"'2017'"}
+    value = get_from_name(name, 'player_id')
+    print(value)
+    querystring = {"season":"'2017'", "player_id":"'{}'".format(value)}
 
     headers = {
         "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
@@ -342,6 +343,30 @@ def print_format_three ():
     print ('!' * 180)
     print ("")
 
+<<<<<<< HEAD
+=======
+def get_from_name(name, item):
+    url = "https://mlb-data.p.rapidapi.com/json/named.search_player_all.bam"
+ 
+    querystring = {"sport_code":"'mlb'","active_sw": "'Y'", "name_part": "'{}'".format(name)}
+
+    headers = {
+        "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
+        "X-RapidAPI-Host": "mlb-data.p.rapidapi.com"
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    response.raise_for_status()
+    response_json = response.json()
+    #json_object = json.loads(response_json)
+    json_dump = json.dumps(response_json, indent=2)
+    print(json_dump)
+    for i in response_json['search_player_all']['queryResults']['row']: 
+         if i == item:
+            return response_json['search_player_all']['queryResults']['row'][i]
+         
+
+>>>>>>> 36651d8f1be584d7ab86198deb78417449699973
 
 def close_connection(connection): 
     connection.close()
