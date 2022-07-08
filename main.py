@@ -1,5 +1,6 @@
 import requests
 import sqlite3
+import json
 
 def __menu (connection):
     exit = False
@@ -284,10 +285,16 @@ def __get_player(name, connection):
     response = requests.request("GET", url, headers=headers, params=querystring)
     response.raise_for_status()
     response_json = response.json()
-    print(response_json)
-    
-    print(response_json['search_player_all']['queryResults']['row']['player_id'])
-    print(response.text)
+    #json_object = json.loads(response_json)
+    json_dump = json.dumps(response_json, indent=2)
+    print(json_dump)
+    for i in response_json['search_player_all']['queryResults']['row']:
+         print(i," = ", response_json['search_player_all']['queryResults']['row'][i])
+    #print(response_json)
+    #print("Name:", response_json['search_player_all']['queryResults']['row']['name_display_first_last'] )
+    #print("Player ID: ", response_json['search_player_all']['queryResults']['row']['player_id'])
+    #print("Player")
+    #print(response.text)
 
     
 
