@@ -349,8 +349,7 @@ def print_format_three ():
     print ('!' * 180)
     print ("")
 
-<<<<<<< HEAD
-=======
+
 def get_from_name(name, item):
     url = "https://mlb-data.p.rapidapi.com/json/named.search_player_all.bam"
  
@@ -371,9 +370,7 @@ def get_from_name(name, item):
          if i == item:
             return response_json['search_player_all']['queryResults']['row'][i]
          
-
->>>>>>> 36651d8f1be584d7ab86198deb78417449699973
-
+         
 def close_connection(connection): 
     connection.close()
 
