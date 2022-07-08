@@ -1,8 +1,9 @@
 import requests
+import sqlite3
 
-def __menu ():
+def __menu (connection):
     exit = False
-
+    
     while (not exit):
         i = str (input ("1 - Search for a player\n2 - Search for a team\n3 - Exit the program" 
                + "\n\nEnter your selection: "))
@@ -10,7 +11,10 @@ def __menu ():
         print_format_one ()
     
         if (i == "1"): 
-            __get_player_info ()
+            print("Please enter the Player name: ")
+            name = input()
+            print("Printing name: "+name)
+            __get_player_info(name, connection)
         elif (i == "2"):
             print_format_three ()
             __get_roster ()
@@ -96,7 +100,7 @@ def __print_league (exit = False):
             print_format_two () 
         
 
-def __get_player_info():
+def __get_player_info(name, connection):
     exit = False
 
     while (not exit):
@@ -105,7 +109,7 @@ def __get_player_info():
         
         if (i == "1"): 
             print_format_three ()
-            __get_player ()
+            __get_player (name, connection)
             print_format_three ()
         elif (i == "2"):
             print_format_two ()
@@ -252,12 +256,10 @@ def __get_proj_hit ():
 
     print(response.text)
 
-
-def __get_player ():
-
-    url = "https://mlb-data.p.rapidapi.com/json/named.player_info.bam"
+def __get_all_teams():
+    url = "https://mlb-data.p.rapidapi.com/json/named.team_all_season.bam"
  
-    querystring = {"sport_code":"'mlb'","player_id":"'493316'"}
+    querystring = {"sport_code":"'mlb'","all-star":"'N'", "sort_order": ""}
 
     headers = {
         "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
@@ -267,6 +269,28 @@ def __get_player ():
     response = requests.request("GET", url, headers=headers, params=querystring)
 
     print(response.text)
+
+def __get_player(name, connection):
+
+    url = "https://mlb-data.p.rapidapi.com/json/named.search_player_all.bam"
+ 
+    querystring = {"sport_code":"'mlb'","active_sw": "'Y'", "name_part": "'{}'".format(name)}
+
+    headers = {
+        "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
+        "X-RapidAPI-Host": "mlb-data.p.rapidapi.com"
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    response.raise_for_status()
+    response_json = response.json()
+    print(response_json)
+    
+    print(response_json['search_player_all']['queryResults']['row']['player_id'])
+    print(response.text)
+
+    
+
 
 
 def __get_roster ():
@@ -302,6 +326,51 @@ def print_format_three ():
     print ('!' * 180)
     print ("")
 
+def close_connection(connection): 
+    connection.close()
+      
+def connect_to_database(database_file):
+     try:
+      connection = sqlite3.connect(database_file)
+      print(sqlite3.version)
+      cur = connection.cursor()
+      #check if database is empty
+      connection.execute("SELECT name FROM sqlite_master")
+      list = cur.fetchall()
+      if len(list) > 0:
+       #print('Database is not empty')
+       return connection
+
+    
+      print('List is empty, creating and updating database')
+      connection.execute('''CREATE TABLE Data(
+                          ID INT PRIMARY KEY NOT NULL,
+                          PLAYER TEXT NOT NULL,
+                          TEAM TEXT NOT NULL,
+                          POSITION TEXT NOT NULL,
+                          COUNTRY TEXT NOT NULL);'''
+                         )
+      cur.execute("INSERT INTO Data(ID,PLAYER, TEAM, POSITION, COUNTRY) VALUES(CESPEDES)")
+      cur.execute("SELECT * FROM PLAYER")
+    
+      print(cur.fetchall())
+       
+      
+    
+     except:
+        print("Error")
+     
+     finally:
+        
+        close_connection(connection)
+        return connection
+
 
 if __name__ == '__main__':
-    __menu ()
+    database_connection = connect_to_database('MLB.db')  #Connect to SQLITE Database
+    __menu (database_connection)
+    
+
+
+
+
