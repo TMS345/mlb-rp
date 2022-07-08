@@ -238,18 +238,8 @@ def __get_proj_pitch (name):
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
-    response.raise_for_status()
-    response_json = response.json()
-    #json_object = json.loads(response_json)
-    json_dump = json.dumps(response_json, indent=2)
-    print (json_dump)
-    for i in response_json ['search_player_all']['queryResults']['row']:
-         print (i , " = ", response_json ['search_player_all']['queryResults']['row'][i])
-    #print(response_json)
-    #print("Name:", response_json['search_player_all']['queryResults']['row']['name_display_first_last'] )
-    #print("Player ID: ", response_json['search_player_all']['queryResults']['row']['player_id'])
-    #print("Player")
-    #print(response.text)
+
+    print(response.text)
 
 
 def __get_proj_hit (name):
@@ -271,11 +261,10 @@ def __get_proj_hit (name):
     json_dump = json.dumps(response_json, indent=2)
     print(json_dump)
     for i in response_json['proj_pecota_batting']['queryResults']['row']:
-         print(i," = ", response_json['search_player_all']['queryResults']['row'][i])
+         print(i," = ", response_json['proj_pecota_batting']['queryResults']['row'][i])
     
 
-
-def __get_all_teams ():
+def __get_all_teams():
     url = "https://mlb-data.p.rapidapi.com/json/named.team_all_season.bam"
  
     querystring = {"sport_code":"'mlb'","all-star":"'N'", "sort_order": ""}
@@ -289,8 +278,7 @@ def __get_all_teams ():
 
     print(response.text)
 
-
-def __get_player (name, connection):
+def __get_player(name, connection):
 
     url = "https://mlb-data.p.rapidapi.com/json/named.search_player_all.bam"
  
@@ -306,14 +294,17 @@ def __get_player (name, connection):
     response_json = response.json()
     #json_object = json.loads(response_json)
     json_dump = json.dumps(response_json, indent=2)
-    print (json_dump)
-    for i in response_json ['search_player_all']['queryResults']['row']:
-         print (i , " = ", response_json ['search_player_all']['queryResults']['row'][i])
+    print(json_dump)
+    for i in response_json['search_player_all']['queryResults']['row']:
+         print(i," = ", response_json['search_player_all']['queryResults']['row'][i])
     #print(response_json)
     #print("Name:", response_json['search_player_all']['queryResults']['row']['name_display_first_last'] )
     #print("Player ID: ", response_json['search_player_all']['queryResults']['row']['player_id'])
     #print("Player")
     #print(response.text)
+
+    
+
 
 
 def __get_roster ():
@@ -349,8 +340,6 @@ def print_format_three ():
     print ('!' * 180)
     print ("")
 
-<<<<<<< HEAD
-=======
 def get_from_name(name, item):
     url = "https://mlb-data.p.rapidapi.com/json/named.search_player_all.bam"
  
@@ -372,43 +361,45 @@ def get_from_name(name, item):
             return response_json['search_player_all']['queryResults']['row'][i]
          
 
->>>>>>> 36651d8f1be584d7ab86198deb78417449699973
 
 def close_connection(connection): 
     connection.close()
+      
+def connect_to_database(database_file):
+     try:
+      connection = sqlite3.connect(database_file)
+      print(sqlite3.version)
+      cur = connection.cursor()
+      #check if database is empty
+      connection.execute("SELECT name FROM sqlite_master")
+      list = cur.fetchall()
+      if len(list) > 0:
+       #print('Database is not empty')
+       return connection
 
-
-def connect_to_database (database_file):
-    try:
-        connection = sqlite3.connect(database_file)
-        print(sqlite3.version)
-        cur = connection.cursor()
-        #check if database is empty
-        connection.execute("SELECT name FROM sqlite_master")
-        list = cur.fetchall()
-        if len (list) > 0:
-            return connection
-
-        print('List is empty, creating and updating database')
-        connection.execute('''CREATE TABLE Data(
-                            ID INT PRIMARY KEY NOT NULL,
-                            PLAYER TEXT NOT NULL,
-                            TEAM TEXT NOT NULL,
-                            POSITION TEXT NOT NULL,
-                            COUNTRY TEXT NOT NULL);'''
-                            )
-        cur.execute("INSERT INTO Data(ID,PLAYER, TEAM, POSITION, COUNTRY) VALUES(CESPEDES)")
-        cur.execute("SELECT * FROM PLAYER")
-        
-        print(cur.fetchall())
-        
-    except:
+    
+      print('List is empty, creating and updating database')
+      connection.execute('''CREATE TABLE Data(
+                          ID INT PRIMARY KEY NOT NULL,
+                          PLAYER TEXT NOT NULL,
+                          TEAM TEXT NOT NULL,
+                          POSITION TEXT NOT NULL,
+                          COUNTRY TEXT NOT NULL);'''
+                         )
+      cur.execute("INSERT INTO Data(ID,PLAYER, TEAM, POSITION, COUNTRY) VALUES(CESPEDES)")
+      cur.execute("SELECT * FROM PLAYER")
+    
+      print(cur.fetchall())
+       
+      
+    
+     except:
         print("Error")
      
-    finally:
+     finally:
+        
         close_connection(connection)
-    
-    return connection
+        return connection
 
 
 if __name__ == '__main__':
