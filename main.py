@@ -255,8 +255,14 @@ def __get_proj_hit (name):
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
-
-    print(response.text)
+    response.raise_for_status()
+    response_json = response.json()
+    #json_object = json.loads(response_json)
+    json_dump = json.dumps(response_json, indent=2)
+    print(json_dump)
+    for i in response_json['proj_pecota_batting']['queryResults']['row']:
+         print(i," = ", response_json['search_player_all']['queryResults']['row'][i])
+    
 
 def __get_all_teams():
     url = "https://mlb-data.p.rapidapi.com/json/named.team_all_season.bam"
