@@ -40,7 +40,7 @@ def __print_proj (name, exit = False):
             print_format_three ()
         elif (i == "2"):
             print_format_three ()
-            __get_proj_pitch ()
+            __get_proj_pitch (name)
             print_format_three ()
         elif (i == "3"):
             exit = True
@@ -130,11 +130,11 @@ def __get_player_info(name, connection):
             print ("Ensure that your input is correct")
 
 
-def __get_season_hit ():
+def __get_season_hit (name):
 
     url = "https://mlb-data.p.rapidapi.com/json/named.sport_hitting_tm.bam"
-
-    querystring = {"league_list_id":"'mlb'","game_type":"'R'","season":"'2017'","player_id":"'493316'"}
+    value = get_from_name(name, 'player_id')
+    querystring = {"league_list_id":"'mlb'","game_type":"'R'","season":"'2017'","player_id":"'{}'".format(value)}
 
     headers = {
         "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
@@ -178,11 +178,11 @@ def __get_league_hit ():
     print(response.text)
 
 
-def __get_career_pitch ():
+def __get_career_pitch (name):
 
     url = "https://mlb-data.p.rapidapi.com/json/named.sport_career_pitching.bam"
-
-    querystring = {"player_id":"'592789'","league_list_id":"'mlb'","game_type":"'R'"}
+    value = get_from_name(name, 'player_id')
+    querystring = {"league_list_id":"'mlb'", "game_type":"'R'", "season": "'2017'","player_id":"'{}'".format(value)}
 
     headers = {
         "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
@@ -190,23 +190,39 @@ def __get_career_pitch ():
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
+    response.raise_for_status()
+    response_json = response.json()
+    #json_object = json.loads(response_json)
+    json_dump = json.dumps(response_json, indent=2)
+    try:
+     for i in response_json['sport_pitching_tm']['queryResults']['row']:
+         print(i," = ", response_json['sport_pitching_tm']['queryResults']['row'][i])
+    except:
+        print("Player has no season stats!")
+    
 
-    print(response.text)
 
-
-def __get_season_pitch ():
+def __get_season_pitch (name):
 
     url = "https://mlb-data.p.rapidapi.com/json/named.sport_pitching_tm.bam"
-
-    querystring = {"season":"'2017'","player_id":"'592789'","league_list_id":"'mlb'","game_type":"'R'"}
+    value = get_from_name(name, 'player_id')
+    querystring = {"league_list_id":"'mlb'", "game_type":"'R'", "season": "'2017'","player_id":"'{}'".format(value)}
 
     headers = {
         "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
         "X-RapidAPI-Host": "mlb-data.p.rapidapi.com"
     }
-
+    
     response = requests.request("GET", url, headers=headers, params=querystring)
-
+    response.raise_for_status()
+    response_json = response.json()
+    #json_object = json.loads(response_json)
+    json_dump = json.dumps(response_json, indent=2)
+    try:
+     for i in response_json['sport_pitching_tm']['queryResults']['row']:
+         print(i," = ", response_json['sport_pitching_tm']['queryResults']['row'][i])
+    except:
+        print("Player has no season stats!")
     print(response.text)
 
 
@@ -229,17 +245,24 @@ def __get_league_pitch ():
 def __get_proj_pitch (name):
     
     url = "https://mlb-data.p.rapidapi.com/json/named.proj_pecota_pitching.bam"
+    value = get_from_name(name, 'player_id')
+    querystring = {"season":"'2017'", "player_id":"'{}'".format(value)}
     
-    querystring = {"player_id":"'592789'","league_list_id":"'mlb'","season":"'2017'"}
-
     headers = {
         "X-RapidAPI-Key": "8b77dd76e4msh15e560cc36053d2p1146c5jsnf90895c51573",
         "X-RapidAPI-Host": "mlb-data.p.rapidapi.com"
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
-
-    print(response.text)
+    response.raise_for_status()
+    response_json = response.json()
+    #json_object = json.loads(response_json)
+    json_dump = json.dumps(response_json, indent=2)
+    try:
+     for i in response_json['proj_pecota_pitching']['queryResults']['row']:
+         print(i," = ", response_json['proj_pecota_pitching']['queryResults']['row'][i])
+    except:
+        print("Player is not a pitcher!")
 
 
 def __get_proj_hit (name):
@@ -259,7 +282,6 @@ def __get_proj_hit (name):
     response_json = response.json()
     #json_object = json.loads(response_json)
     json_dump = json.dumps(response_json, indent=2)
-    print(json_dump)
     for i in response_json['proj_pecota_batting']['queryResults']['row']:
          print(i," = ", response_json['proj_pecota_batting']['queryResults']['row'][i])
     
@@ -277,6 +299,7 @@ def __get_all_teams():
     response = requests.request("GET", url, headers=headers, params=querystring)
 
     print(response.text)
+
 
 def __get_player(name, connection):
 
@@ -355,7 +378,6 @@ def get_from_name(name, item):
     response_json = response.json()
     #json_object = json.loads(response_json)
     json_dump = json.dumps(response_json, indent=2)
-    print(json_dump)
     for i in response_json['search_player_all']['queryResults']['row']: 
          if i == item:
             return response_json['search_player_all']['queryResults']['row'][i]
